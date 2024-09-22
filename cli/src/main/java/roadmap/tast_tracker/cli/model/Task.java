@@ -1,5 +1,6 @@
 package roadmap.tast_tracker.cli.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import roadmap.tast_tracker.cli.enums.TaskStatus;
@@ -13,7 +14,9 @@ public class Task {
     private static Long nextId = 0L;
     private String description;
     private TaskStatus status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public Task(String description) {
