@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roadmap.tast_tracker.cli.enums.TaskStatus;
 import roadmap.tast_tracker.cli.exception.NotFoundTaskException;
 import roadmap.tast_tracker.cli.model.Task;
@@ -28,15 +29,18 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
+    @Transactional
     public String addTask(String description) {
-        Task task = taskRepository.createTask(description);
+        Task task = taskRepository.save(new Task(description));
         return "Task added successfully (ID: " + task.getId() + ")";
     }
 
     @Override
+    @Transactional
     public String updateTaskDescription(Long id, String description) {
         try {
-            taskRepository.updateTaskDescription(id, description);
+            Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundTaskException(id));
+            task.setDescription(description);
             return "Task description updated successfully";
         } catch (NotFoundTaskException e) {
             return e.getMessage();
@@ -44,9 +48,11 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
+    @Transactional
     public String updateTaskStatus(Long id, TaskStatus status) {
         try {
-            taskRepository.updateTaskStatus(id, status);
+            Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundTaskException(id));
+            task.setStatus(status);
             return "Task status updated successfully";
         } catch (NotFoundTaskException e) {
             return e.getMessage();
@@ -54,9 +60,11 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
+    @Transactional
     public String deleteTask(Long id) {
         try {
-            taskRepository.deleteTask(id);
+            Task task = taskRepository.findById(id).orElseThrow(() -> new NotFoundTaskException(id));
+            taskRepository.delete(task);
             return "Task deleted successfully";
         } catch (NotFoundTaskException e) {
             return e.getMessage();
@@ -64,16 +72,19 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Task> getAllTasks() {
-        return taskRepository.getAllTasks();
+        return taskRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Task> getTasksByStatus(TaskStatus status) {
-        return taskRepository.getTasksByStatus(status);
+        return taskRepository.findAllByStatus(status);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public String downloadTasks() {
         String userHome = System.getProperty("user.home");
         String downloadPath = Paths.get(userHome, "Downloads", "tasks.json").toString();
@@ -81,10 +92,10 @@ public class TaskServiceImpl implements TaskService{
 
         try{
             if (file.exists() && file.canWrite()) 
-                objectMapper.writeValue(Paths.get(downloadPath).toFile(), taskRepository.getAllTasks());
+                objectMapper.writeValue(Paths.get(downloadPath).toFile(), taskRepository.findAll());
             else {
                 downloadPath = Paths.get(userHome, "tasks.json").toString();
-                objectMapper.writeValue(Paths.get(downloadPath).toFile(), taskRepository.getAllTasks());
+                objectMapper.writeValue(Paths.get(downloadPath).toFile(), taskRepository.findAll());
             }
             return "Tasks downloaded successfully to " + downloadPath;
         } catch (IOException  e) {
