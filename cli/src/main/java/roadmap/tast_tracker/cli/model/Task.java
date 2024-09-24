@@ -6,6 +6,7 @@ import lombok.Setter;
 import roadmap.tast_tracker.cli.enums.TaskStatus;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Setter
 @Getter
@@ -29,12 +30,13 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        return "\nTask{" +
                 "id=" + id +
                 ", description='" + description + '\'' +
                 ", status=" + status +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+                ", createdAt=" + createdAt.format(formatter) +
+                ", updatedAt=" + updatedAt.format(formatter) +
+                "}";
     }
 }
