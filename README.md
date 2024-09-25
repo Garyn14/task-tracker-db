@@ -4,28 +4,46 @@ Task tracker is a project used to track and manage your tasks. In this task, you
 
 ## Requirements
 
-The application should run from the command line, accept user actions and inputs as arguments, and store the tasks in a JSON file. The user should be able to:
+The application should now use PostgreSQL as the database to store tasks, Flyway for managing database migrations, and Spring Boot for input validation. The user should still be able to:
 
 - Add, Update, and Delete tasks
-- Mark a task as to do, in progress or done
+- Mark a task as to do, in progress, or done
 - List all tasks
 - List all tasks that are done
 - List all tasks that are to do
 - List all tasks that are in progress
 
-Here are some constraints to guide the implementation:
+### Database
 
-- You can use any programming language to build this project.
-- Use positional arguments in command line to accept user inputs.
-- Use a JSON file to store the tasks in the current directory.
-- The JSON file should be created if it does not exist.
-- Use the native file system module of your programming language to interact with the JSON file.
-- Do not use any external libraries or frameworks to build this project.
-- Ensure to handle errors and edge cases gracefully.
+- The application should use PostgreSQL to store the tasks.
+- Flyway should be used for database migrations to handle schema changes.
+- Spring Boot should manage the application configuration and validate user inputs before adding or updating tasks in the database.
 
-## Example
+### Task Properties
 
-The list of commands and their usage is given below:
+Each task will have the following properties:
+
+- **id**: A unique identifier for the task
+- **description**: A short description of the task
+- **status**: The status of the task (`to do`, `in-progress`, `done`)
+- **createdAt**: The date and time when the task was created
+- **updatedAt**: The date and time when the task was last updated
+
+## Instructions
+
+To set up the application with PostgreSQL, Flyway, and Spring Boot:
+
+1. Ensure PostgreSQL is installed and running.
+2. Configure the database connection in the `application.properties` file.
+3. Use Flyway to manage database migrations. Run the command:
+    ```bash
+    ./mvnw flyway:migrate
+    ```
+4. Build and run the Spring Boot application to manage tasks through the CLI.
+
+### Example Commands
+
+The list of commands and their usage remains the same:
 
 ```bash
 # Adding a new task
@@ -36,7 +54,7 @@ task-cli add "Buy groceries"
 task-cli update 1 "Buy groceries and cook dinner"
 # Output: Task description updated successfully
 
-#delete task
+# Delete task
 task-cli delete 1
 # Output: Task deleted successfully
 
@@ -52,21 +70,3 @@ task-cli list
 task-cli list to-do
 task-cli list done
 task-cli list in-progress
-```
-
-## Task Properties
-
-Each task should have the following properties:
-
-- **id**: A unique identifier for the task
-- **description**: A short description of the task
-- **status**: The status of the task (`to do`, `in-progress`, `done`)
-- **createdAt**: The date and time when the task was created
-- **updatedAt**: The date and time when the task was last updated
-
-Make sure to add these properties to the JSON file when adding a new task and update them when updating a task.
-
-## Instructions
-
-The instructions was created by: [Roadmap](https://roadmap.sh/projects/task-tracker)
-
